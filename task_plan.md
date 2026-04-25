@@ -47,6 +47,12 @@
 - [ ] 6.3. Генератор Security Scorecard (PDF, JSON).
 - [ ] 6.4. Разработка Web UI для загрузки APK и просмотра отчетов.
 
+## Phase 7: AI-Интеграция (Local LLM)
+- [ ] 7.1. Настройка Backend-клиента (Ollama REST API) для связи с `host.docker.internal:11434`.
+- [ ] 7.2. Создание промптов для анализа SAST-уязвимостей (фильтрация ложных срабатываний).
+- [ ] 7.3. Создание эндпоинта `POST /api/v1/ai/explain` для генерации объяснений и патчей.
+- [ ] 7.4. Интеграция AI-панели (кнопка "Ask AI" и чат) в React Frontend.
+
 ## Errors & Blockers
 | Error | Phase | Resolution |
 |-------|-------|------------|

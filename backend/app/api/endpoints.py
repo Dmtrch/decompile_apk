@@ -35,8 +35,20 @@ async def upload_apk(file: UploadFile = File(...)):
     }
 
 from app.infra.report_generator import ReportGenerator
+from app.infra.ai_analyzer import AIAnalyzer
+from pydantic import BaseModel
 
 report_gen = ReportGenerator()
+ai_analyzer = AIAnalyzer()
+
+class AIExplainRequest(BaseModel):
+    code_snippet: str
+    issue_description: str
+
+@router.post("/ai/explain")
+async def explain_issue(req: AIExplainRequest):
+    analysis = await ai_analyzer.explain_vulnerability(req.code_snippet, req.issue_description)
+    return analysis
 
 @router.get("/report/{job_id}")
 async def get_report(job_id: str):

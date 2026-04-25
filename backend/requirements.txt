@@ -1,1 +1,8 @@
-fastapi\nuvicorn\ncelery\nredis\nsqlalchemy\nalembic\npydantic-settings
+fastapi
+uvicorn
+celery
+redis
+sqlalchemy
+alembic
+pydantic-settings
+httpx

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Upload, Shield, Zap, FileText, CheckCircle, AlertTriangle, Loader2, Download } from 'lucide-react';
+import { Upload, Shield, Zap, FileText, CheckCircle, AlertTriangle, Loader2, Download, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const API_BASE = "http://localhost:8000/api/v1";
@@ -27,6 +27,8 @@ function App() {
   const [status, setStatus] = useState<string | null>(null);
   const [report, setReport] = useState<Scorecard | null>(null);
   const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState<number | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<Record<number, any>>({});
 
   const handleUpload = async () => {
     if (!file) return;
@@ -43,6 +45,20 @@ function App() {
       alert("Upload failed. Make sure backend is running.");
     }
     setLoading(false);
+  };
+
+  const handleAIExplain = async (idx: number, finding: any) => {
+    setAiLoading(idx);
+    try {
+      const { data } = await axios.post(`${API_BASE}/ai/explain`, {
+        code_snippet: "/* Code context from decompiler would go here */",
+        issue_description: finding.message
+      });
+      setAiAnalysis(prev => ({ ...prev, [idx]: data }));
+    } catch (e) {
+      alert("AI Service unreachable. Make sure Ollama is running.");
+    }
+    setAiLoading(null);
   };
 
   useEffect(() => {
@@ -75,7 +91,7 @@ function App() {
             </div>
             <h1 className="text-2xl font-bold tracking-tight">Decompile & Audit APK</h1>
           </div>
-          <div className="text-slate-400 text-sm">v1.0.0 Protorype</div>
+          <div className="text-slate-400 text-sm">v1.0.0 Prototype</div>
         </header>
 
         {/* Upload Section */}
@@ -177,15 +193,45 @@ function App() {
                         {finding.severity === 'HIGH' ? <AlertTriangle /> : <CheckCircle />}
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-1">
-                          <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase
-                            ${finding.severity === 'HIGH' ? 'bg-red-500/10 text-red-500' : 
-                              finding.severity === 'WARNING' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-blue-500/10 text-blue-500'}`}>
-                            {finding.severity}
-                          </span>
-                          <span className="text-slate-500 text-xs font-mono">{finding.source} • {finding.location}</span>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-3">
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase
+                              ${finding.severity === 'HIGH' ? 'bg-red-500/10 text-red-500' : 
+                                finding.severity === 'WARNING' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-blue-500/10 text-blue-500'}`}>
+                              {finding.severity}
+                            </span>
+                            <span className="text-slate-500 text-xs font-mono">{finding.source} • {finding.location}</span>
+                          </div>
+                          
+                          <button 
+                            onClick={() => handleAIExplain(idx, finding)}
+                            className="text-xs flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-primary px-2 py-1 rounded transition-colors"
+                          >
+                            {aiLoading === idx ? <Loader2 className="animate-spin w-3 h-3" /> : <Bot className="w-3 h-3" />}
+                            Ask AI
+                          </button>
                         </div>
                         <p className="text-slate-200 leading-relaxed">{finding.message}</p>
+                        
+                        {/* AI Response Display */}
+                        {aiAnalysis[idx] && (
+                          <motion.div 
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            className="mt-4 p-4 bg-slate-900 rounded-lg border-l-4 border-primary overflow-hidden"
+                          >
+                            <div className="text-primary text-xs font-bold mb-2 flex items-center gap-2">
+                              <Bot className="w-4 h-4" /> AI ANALYST (Ollama: Qwen 3.6)
+                            </div>
+                            <p className="text-slate-300 text-sm mb-3 whitespace-pre-wrap">{aiAnalysis[idx].explanation}</p>
+                            {aiAnalysis[idx].patch && (
+                              <div className="bg-black/40 p-3 rounded font-mono text-xs text-green-400 overflow-x-auto">
+                                <div className="text-slate-500 mb-1">// Suggested Patch</div>
+                                {aiAnalysis[idx].patch}
+                              </div>
+                            )}
+                          </motion.div>
+                        )}
                       </div>
                     </div>
                   ))}
