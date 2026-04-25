@@ -19,6 +19,12 @@ RUN wget https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/li
     chmod +x /usr/local/bin/apktool && \
     wget https://github.com/iBotPeaches/Apktool/releases/download/v2.9.1/apktool_2.9.1.jar -O /usr/local/bin/apktool.jar
 
+# Установка Gradle
+RUN wget https://services.gradle.org/distributions/gradle-8.4-bin.zip && \
+    unzip gradle-8.4-bin.zip -d /opt && \
+    ln -s /opt/gradle-8.4/bin/gradle /usr/local/bin/gradle && \
+    rm gradle-8.4-bin.zip
+
 WORKDIR /app
 
 COPY requirements.txt .
