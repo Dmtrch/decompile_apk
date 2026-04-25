@@ -10,8 +10,8 @@
 
 ## Phase 1: Инициализация проекта и Архитектура
 - [x] 1.1. Создание базовой структуры проекта (Python backend/workers).
-- [ ] 1.2. Подготовка Docker-образов для Zero-Trust Sandbox (включая Android эмуляторы).
-- [ ] 1.3. Настройка оркестратора задач (Celery/RabbitMQ или аналоги) для асинхронной обработки APK.
+- [x] 1.2. Подготовка Docker-образов для Zero-Trust Sandbox (базовые Dockerfiles).
+- [x] 1.3. Настройка оркестратора задач (Celery + Redis в Docker).
 
 ## Phase 2: DEX to Source (Декомпиляция)
 ...

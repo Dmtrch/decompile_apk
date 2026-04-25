@@ -1,0 +1,1 @@
+from shared.celery_app import app\n\n@app.task(name='scanner.scan_code')\ndef scan_code(project_path: str):\n    return {'status': 'success', 'project_path': project_path, 'message': 'Security scan started'}

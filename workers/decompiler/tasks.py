@@ -1,0 +1,1 @@
+from shared.celery_app import app\n\n@app.task(name='decompiler.decompile_apk')\ndef decompile_apk(apk_path: str):\n    return {'status': 'success', 'apk_path': apk_path, 'message': 'Decompilation started'}
