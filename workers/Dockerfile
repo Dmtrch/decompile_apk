@@ -14,6 +14,11 @@ RUN wget https://github.com/skylot/jadx/releases/download/v1.4.7/jadx-1.4.7.zip 
     ln -s /opt/jadx/bin/jadx /usr/local/bin/jadx && \
     rm jadx-1.4.7.zip
 
+# Установка Apktool
+RUN wget https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool -O /usr/local/bin/apktool && \
+    chmod +x /usr/local/bin/apktool && \
+    wget https://github.com/iBotPeaches/Apktool/releases/download/v2.9.1/apktool_2.9.1.jar -O /usr/local/bin/apktool.jar
+
 WORKDIR /app
 
 COPY requirements.txt .
