@@ -42,5 +42,16 @@ services:
       - db
       - redis
 
+  mock_server:
+    build:
+      context: ./sandbox/mock_server
+      dockerfile: ../../backend/Dockerfile # Используем тот же образ, что для backend
+    ports:
+      - "8080:8000"
+    volumes:
+      - ./sandbox/mock_server:/app
+    environment:
+      - APP_MODULE=main:app
+
 volumes:
   postgres_data:
