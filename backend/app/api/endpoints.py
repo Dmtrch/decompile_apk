@@ -21,12 +21,13 @@ async def upload_apk(file: UploadFile = File(...)):
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    # Запуск задачи декомпиляции
-    task = celery_app.send_task(
-        "decompiler.decompile_apk",
-        args=[file_path, job_id],
-        task_id=job_id
+    # Запуск цепочки задач: Декомпиляция -> Сканирование
+    task_chain = chain(
+        celery_app.signature("decompiler.decompile_apk", args=[file_path, job_id]),
+        celery_app.signature("scanner.scan_code", args=[job_id])
     )
+    
+    task = task_chain.apply_async(task_id=job_id)
     
     return {
         "job_id": job_id,

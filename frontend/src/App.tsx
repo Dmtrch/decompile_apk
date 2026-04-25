@@ -18,6 +18,7 @@ interface Scorecard {
     severity: string;
     message: string;
     location: string;
+    code_snippet?: string;
   }>;
 }
 
@@ -51,11 +52,12 @@ function App() {
     setAiLoading(idx);
     try {
       const { data } = await axios.post(`${API_BASE}/ai/explain`, {
-        code_snippet: "/* Code context from decompiler would go here */",
+        code_snippet: finding.code_snippet || "// Code snippet not available",
         issue_description: finding.message
       });
       setAiAnalysis(prev => ({ ...prev, [idx]: data }));
     } catch (e) {
+      console.error("AI Explain failed", e);
       alert("AI Service unreachable. Make sure Ollama is running.");
     }
     setAiLoading(null);

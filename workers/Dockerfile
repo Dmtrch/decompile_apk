@@ -25,6 +25,20 @@ RUN wget https://services.gradle.org/distributions/gradle-8.4-bin.zip && \
     ln -s /opt/gradle-8.4/bin/gradle /usr/local/bin/gradle && \
     rm gradle-8.4-bin.zip
 
+# Установка Android SDK
+ENV ANDROID_HOME /opt/android-sdk
+RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
+    wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip && \
+    unzip commandlinetools-linux-10406996_latest.zip -d ${ANDROID_HOME}/cmdline-tools && \
+    mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest && \
+    rm commandlinetools-linux-10406996_latest.zip
+
+ENV PATH ${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools
+
+# Принятие лицензий и установка необходимых компонентов
+RUN yes | sdkmanager --licenses && \
+    sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+
 WORKDIR /app
 
 COPY requirements.txt .

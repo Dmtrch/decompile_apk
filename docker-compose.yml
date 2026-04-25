@@ -50,6 +50,19 @@ services:
       - db
       - redis
 
+  android-emulator:
+    image: budtmo/docker-android-x86-11.0
+    privileged: true
+    ports:
+      - "6080:6080" # NoVNC
+      - "5554:5554" # Emulator console
+      - "5555:5555" # ADB
+    environment:
+      - DEVICE=Samsung Galaxy S10
+      - WEB_VNC=true
+    volumes:
+      - ./data/emulator:/data
+
   mock_server:
     build:
       context: ./sandbox/mock_server

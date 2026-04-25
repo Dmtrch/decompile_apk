@@ -16,7 +16,8 @@ class ReportGenerator:
                 "source": "SAST",
                 "severity": issue.get("severity", "INFO"),
                 "message": issue.get("message", "Unknown issue"),
-                "location": issue.get("path", "N/A")
+                "location": issue.get("path", "N/A"),
+                "code_snippet": issue.get("code_snippet") # Передаем сниппет кода
             })
 
         # 2. Обработка разрешений Манифеста

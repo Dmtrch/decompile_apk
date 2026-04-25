@@ -37,19 +37,35 @@ class ScannerService:
         return results
 
     def _run_semgrep(self, sources_dir: str):
-        """Запуск статического анализа кода"""
+        """Запуск статического анализа кода с извлечением сниппетов"""
         try:
             logger.info(f"Running Semgrep on {sources_dir}...")
-            # Используем встроенные правила для Java и наши кастомные
             result = subprocess.run(
                 ["semgrep", "scan", "--json", "--config", "p/java", sources_dir],
                 capture_output=True, text=True
             )
-            if result.returncode in [0, 1]: # Semgrep возвращает 1 если найдены уязвимости
-                return json.loads(result.stdout).get("results", [])
-            return f"error: {result.stderr}"
+            if result.returncode in [0, 1]:
+                hits = json.loads(result.stdout).get("results", [])
+                for hit in hits:
+                    # Извлекаем фрагмент кода из файла для AI
+                    hit["code_snippet"] = self._get_code_snippet(hit.get("path"), hit.get("start", {}).get("line"))
+                return hits
+            return []
         except Exception as e:
-            return f"error: {str(e)}"
+            return []
+
+    def _get_code_snippet(self, file_path, line_number, context_lines=5):
+        """Читает фрагмент кода вокруг указанной строки"""
+        if not file_path or not os.path.exists(file_path) or not line_number:
+            return None
+        try:
+            with open(file_path, "r", errors="ignore") as f:
+                lines = f.readlines()
+                start = max(0, line_number - context_lines - 1)
+                end = min(len(lines), line_number + context_lines)
+                return "".join(lines[start:end])
+        except:
+            return None
 
     def _analyze_manifest(self, manifest_path: str):
         """Анализ манифеста на опасные разрешения"""

@@ -45,18 +45,24 @@ android {
             f.write("rootProject.name = 'rebuilt_apk'\n")
 
     def build_apk(self, project_dir: str):
-        """Запускает процесс сборки через Gradle"""
+        """Запускает процесс сборки через Gradle с реальным Android SDK"""
         try:
-            logger.info(f"Starting build in {project_dir}...")
-            # В реальном сценарии потребуются Android SDK и лицензии
-            # Для прототипа мы фиксируем намерение и проверяем структуру
+            logger.info(f"Starting build in {project_dir} using SDK at {os.getenv('ANDROID_HOME')}...")
+            
+            # Убеждаемся, что локальные свойства проекта указывают на SDK
+            with open(os.path.join(project_dir, "local.properties"), "w") as f:
+                f.write(f"sdk.dir={os.getenv('ANDROID_HOME')}\n")
+
             result = subprocess.run(
-                ["gradle", "assembleDebug"],
+                ["gradle", "assembleDebug", "--no-daemon"],
                 cwd=project_dir,
-                capture_output=True, text=True
+                capture_output=True, text=True,
+                env={**os.environ, "JAVA_OPTS": "-Xmx2g"}
             )
             if result.returncode == 0:
-                return "success", os.path.join(project_dir, "build/outputs/apk/debug/app-debug.apk")
+                apk_path = os.path.join(project_dir, "build/outputs/apk/debug/app-debug.apk")
+                logger.info(f"Build successful! APK at {apk_path}")
+                return "success", apk_path
             else:
                 logger.warning(f"Build failed: {result.stderr}")
                 return "failed", result.stderr
