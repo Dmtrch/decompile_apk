@@ -1,0 +1,1 @@
+celery\nredis\njadx-cli\nsemgrep\nfrida-tools\nmitmproxy

@@ -6,6 +6,8 @@
 - **Status**: Completed setup of planning files.
 - **Actions taken**:
   ... (предыдущие действия)
-  - Created `architecture.md`: задокументирована High-Level архитектура (C4), Bounded Contexts (DDD) и процесс внедрения ADR.
   - Initialized ADR repository: созданы `docs/adr/README.md` и `docs/adr/0001-initial-architecture-stack.md`.
-- **Next Steps**: План архитектуры и процесс модернизации готовы. Переходим к инициализации структуры проекта (Phase 1).
+  - Created base directory structure for `backend` (FastAPI) and `workers` (Celery) following Clean Architecture.
+  - Initialized `backend/requirements.txt` and `workers/requirements.txt`.
+  - Created FastAPI entry point `backend/app/main.py`.
+- **Next Steps**: Настройка Docker-окружения и оркестрации (Phase 1.2, 1.3).
