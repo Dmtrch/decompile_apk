@@ -34,11 +34,22 @@ async def upload_apk(file: UploadFile = File(...)):
         "task_id": task.id
     }
 
-@router.get("/status/{job_id}")
-async def get_status(job_id: str):
+from app.infra.report_generator import ReportGenerator
+
+report_gen = ReportGenerator()
+
+@router.get("/report/{job_id}")
+async def get_report(job_id: str):
     res = AsyncResult(job_id, app=celery_app)
-    return {
-        "job_id": job_id,
-        "state": res.state,
-        "result": res.result if res.ready() else None
-    }
+    if not res.ready():
+        return {"status": "processing", "job_id": job_id}
+    
+    result = res.result
+    # В реальном приложении здесь был бы вызов цепочки задач (Decompile -> Scan)
+    # Для прототипа эмулируем агрегацию
+    
+    static_results = result.get("static_results", {})
+    dynamic_results = result.get("dynamic_results", [])
+    
+    scorecard = report_gen.generate_scorecard(static_results, dynamic_results)
+    return scorecard
